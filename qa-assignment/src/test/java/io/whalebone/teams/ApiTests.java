@@ -11,12 +11,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import io.whalebone.teams.pojo.Team;
+import io.whalebone.teams.utils.RosterScraper;
 
 import static org.hamcrest.Matchers.equalTo;
 
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 public class ApiTests {
@@ -40,6 +42,10 @@ public class ApiTests {
         return mapper.readValue(teamsListNode.toString(), new TypeReference<>() {});
     }
 
+    private Team getOldestTeam(List<Team> teams) {
+        return teams.stream().min(Comparator.comparingInt(t -> t.getFounded())).orElseThrow(() -> new NoSuchElementException("No teams found"));
+    }
+
     @Test
     public void testTeamCount() {
         RestAssured.get(TEAMS_ENDPOINT)
@@ -58,9 +64,7 @@ public class ApiTests {
 
         try {
             List<Team> teams = deserializeTeams(response);
-            Team oldest = teams.stream()
-                .min(Comparator.comparingInt(t -> t.getFounded()))
-                .orElseThrow(() -> new AssertionError());
+            Team oldest = getOldestTeam(teams);
             Assert.assertEquals(OLDEST_TEAM, oldest.getName());
 
         } catch (JsonProcessingException e) {
@@ -108,6 +112,24 @@ public class ApiTests {
             metropolitanTeams.forEach(team -> {
                 Assert.assertTrue(METROPOLITAN_TEAMS.contains(team.getName()), "Unknown team in Metropolitan division: " + team.getName());
             });
+        } catch (JsonProcessingException e) {
+            Assert.fail("Failed to process JSON response: " + e);
+        }  
+    }
+
+    @Test
+    public void testNumberOfCanadiansInOldestTeam() {
+        Response response = RestAssured.get(TEAMS_ENDPOINT)
+            .then()
+            .statusCode(200)
+            .extract()
+            .response();
+
+        try {
+            List<Team> teams = deserializeTeams(response);
+            Team oldestTeam = getOldestTeam(teams);
+            Map<String, Integer> nationalities = RosterScraper.countCanadiansVsAmericans(oldestTeam.getOfficialSiteUrl() + "roster/");
+            Assert.assertTrue(nationalities.get("CAN") > nationalities.get("USA"));
         } catch (JsonProcessingException e) {
             Assert.fail("Failed to process JSON response: " + e);
         }  
