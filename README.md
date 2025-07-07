@@ -46,6 +46,6 @@ This repository contains automated tests for the Whalebone QA assignment.
 - **UI Tests:**  
   Located in [`io.whalebone.ui`](src/test/java/io/whalebone/ui/), these tests UI features of [uitestingplayground.com](http://uitestingplayground.com/):
   - Login form tests ([`SampleAppTests`](src/test/java/io/whalebone/ui/SampleAppTests.java))
-  - Delay test ([`DelayTest`](src/test/java/io/whalebone/ui/DelayTests.java))
+  - Delay test ([`DelayTest`](src/test/java/io/whalebone/ui/DelayTest.java))
   - Progress bar test ([`ProgressBarTest`](src/test/java/io/whalebone/ui/ProgressBarTest.java))
  
