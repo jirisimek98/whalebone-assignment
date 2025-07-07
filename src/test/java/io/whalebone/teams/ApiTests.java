@@ -36,16 +36,19 @@ public class ApiTests {
         "Pittsburgh Penguins", 
         "Washington Capitals");
 
+    // deserialize response body into a list of teams
     private List<Team> deserializeTeams(Response response) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode teamsListNode = mapper.readTree(response.asString()).get("teams");
         return mapper.readValue(teamsListNode.toString(), new TypeReference<>() {});
     }
 
+    // picking the oldest team, used in multiple tests
     private Team getOldestTeam(List<Team> teams) {
         return teams.stream().min(Comparator.comparingInt(t -> t.getFounded())).orElseThrow(() -> new NoSuchElementException("No teams found"));
     }
 
+    // verifies that tha API returns the expected amount of teams
     @Test
     public void testTeamCount() {
         RestAssured.get(TEAMS_ENDPOINT)
@@ -54,6 +57,7 @@ public class ApiTests {
             .body("teams.size()", equalTo(TEAM_COUNT));
     }
 
+    // verifies expected name of the oldest team
     @Test
     public void testOldestTeam() {
         Response response = RestAssured.get(TEAMS_ENDPOINT)
@@ -72,6 +76,7 @@ public class ApiTests {
         }        
     }
 
+    // verifies that there is a city with multiple teams and checks that the team names contain the name of the city
     @Test
     public void testCityWithMultipleTeams() {
         Response response = RestAssured.get(TEAMS_ENDPOINT)
@@ -96,6 +101,7 @@ public class ApiTests {
         }  
     }
 
+    // verifies the number of teams in metropolitan division and checks their names against a list of known teams
     @Test
     public void testMetropolitanDivision() {
         Response response = RestAssured.get(TEAMS_ENDPOINT)
@@ -117,6 +123,7 @@ public class ApiTests {
         }  
     }
 
+    // uses RosterScraper util to exctract number of Canadians and Americans from a team roster and verifies that there are more Canadians
     @Test
     public void testNumberOfCanadiansInOldestTeam() {
         Response response = RestAssured.get(TEAMS_ENDPOINT)

@@ -7,6 +7,7 @@ import com.microsoft.playwright.assertions.PlaywrightAssertions;
 
 public class DelayTest extends UITest {
 
+    // tests that the delayed page loads in a reasonable time
     @Test
     public void testDelay() {
         page.navigate("http://uitestingplayground.com/");

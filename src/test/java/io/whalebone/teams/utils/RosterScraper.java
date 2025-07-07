@@ -17,6 +17,7 @@ public class RosterScraper {
     private static BrowserContext context;
     private static Page page;
 
+    // method that specifically scrapes a team roster for the number of Canadian and American players
     public static Map<String, Integer> countCanadiansVsAmericans(String uri) {
         playwright = Playwright.create();
         browser = playwright.chromium().launch();

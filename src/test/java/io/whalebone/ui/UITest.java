@@ -10,6 +10,7 @@ import com.microsoft.playwright.BrowserContext;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
 
+// base class for UI tests with playwright, initiates playwright resources before each test
 public class UITest {
 
     protected static Playwright playwright;
